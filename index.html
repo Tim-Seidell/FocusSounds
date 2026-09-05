@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    body {
+        text-align: center;
+        font-family: Arial;
+    }
+    .audioCard {
+        flex: 1 1 200px;     /* Allows growing/shrinking, but targets a baseline width of 200px */
+        
+        display: block;
+        background-color: lightgray;
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 20px;
+        text-align: center;
+        justify-content: center; /* Centers horizontally */
+        align-content: center;     /* Centers vertically */
+        margin: 2%;
+        font-size: 30px;
+    }
+
+    #mainDiv {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        width: 50%;
+        margin: auto;
+    }
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>FocusSounds</h1>
+    <div id="mainDiv"></div>
+</body>
+<script>
+    // Add new audio files to this list, title only
+    var audioList = [
+        "Fire",
+        "Rain",
+        "Wind",
+        "Crickets",
+        "Leaves"
+    ];
+
+    // Load all audio files
+    audioList.forEach(audioFile => {
+        var mainDiv = document.getElementById("mainDiv");
+        
+        // Make new div for "card"
+        var newAudioCard = document.createElement("div");
+        newAudioCard.className = "audioCard";
+
+        // Audio Card name
+        var audioName = document.createElement("p");
+        audioName.innerText = audioFile;
+
+        // Volume slider
+        var volumeSlider = document.createElement("input");
+        volumeSlider.type = "range";
+        volumeSlider.min = "0";
+        volumeSlider.max = "1";
+        volumeSlider.step = "0.01";
+        volumeSlider.value = "0.5";
+
+        // Create new audio element
+        var newAudioElement = document.createElement("audio");
+        newAudioElement.setAttribute("loop", "");
+        
+        // Create new source element
+        var newSourceElement = document.createElement("source");
+        newSourceElement.src = "audio/" + audioFile + ".mp3";
+        newSourceElement.type = "audio/mp3";
+        
+        // Parent all nodes, force reload, and add to body
+        newAudioCard.appendChild(audioName);
+        newAudioCard.appendChild(volumeSlider);
+        newAudioCard.appendChild(newAudioElement);
+        newAudioElement.appendChild(newSourceElement);
+        newAudioElement.load();
+        mainDiv.appendChild(newAudioCard);
+
+        // Add play/pause function
+        newAudioCard.addEventListener('click', (e) => {
+            if(e.target !== volumeSlider) {
+                if(newAudioElement.paused) {
+                    newAudioCard.style.backgroundColor = "#2657de";
+                    newAudioCard.style.color = "white";
+                    newAudioElement.play();
+                } else {
+                    newAudioCard.style.backgroundColor = "lightgrey";
+                    newAudioCard.style.color = "black";
+                    newAudioElement.pause();
+                }
+            }
+        });
+
+        // Set initial audio volume to slider
+        newAudioElement.volume = volumeSlider.value;
+
+        // Volume slider functionality
+        volumeSlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            newAudioElement.volume = value;
+        });
+    });
+
+</script>
+</html>
