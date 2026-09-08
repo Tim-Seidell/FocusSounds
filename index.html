@@ -123,6 +123,13 @@
         volumeSlider.addEventListener('input', (e) => {
             gainNode.gain.setValueAtTime(e.target.value, audioContext.currentTime);
         });
+
+        // Fix autoplay issues???
+        newAudioElement.addEventListener('play', () => {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        });
     });
 </script>
 </html>
