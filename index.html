@@ -6,8 +6,9 @@
         font-family: Arial;
     }
     .audioCard {
-        flex: 1 1 200px;     /* Allows growing/shrinking, but targets a baseline width of 200px */
-        
+        /* "flex" Allows growing/shrinking, but targets a baseline width of
+        200px */
+        flex: 1 1 200px;
         display: block;
         background-color: lightgray;
         max-width: 200px;
@@ -41,7 +42,10 @@
     <div id="mainDiv"></div>
 </body>
 <script>
-    // Add new audio files to this list, title only
+    // Global audio context
+    const audioContext = new window.AudioContext;
+
+    // Add new .mp3 files to this list, title only (no file extension)
     var audioList = [
         "Fire",
         "Rain",
@@ -70,10 +74,20 @@
         volumeSlider.step = "0.01";
         volumeSlider.value = "0.5";
 
-        // Create new audio element
+        // Create new audio element and node
         var newAudioElement = document.createElement("audio");
+        newAudioElement.crossOrigin = "anonymous";
         newAudioElement.setAttribute("loop", "");
-        
+
+        // Set up new audio source within Audio Context and create a gain node
+        // for volume control (This is the only way to retain volume control on
+        // Safari iOS, all tracks will be at max volume and only controllable
+        // with system volume)
+        const newAudioNode = audioContext.createMediaElementSource(newAudioElement);
+        const gainNode = audioContext.createGain();
+        newAudioNode.connect(gainNode);
+        gainNode.connect(audioContext.destination)
+
         // Create new source element
         var newSourceElement = document.createElement("source");
         newSourceElement.src = "audio/" + audioFile + ".mp3";
@@ -103,14 +117,12 @@
         });
 
         // Set initial audio volume to slider
-        newAudioElement.volume = volumeSlider.value;
+        gainNode.gain.setValueAtTime(volumeSlider.value, audioContext.currentTime);
 
         // Volume slider functionality
         volumeSlider.addEventListener('input', (e) => {
-            const value = e.target.value;
-            newAudioElement.volume = value;
+            gainNode.gain.setValueAtTime(e.target.value, audioContext.currentTime);
         });
     });
-
 </script>
 </html>
